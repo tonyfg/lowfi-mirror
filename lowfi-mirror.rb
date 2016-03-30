@@ -11,6 +11,8 @@ MPCENC = 'mpcenc --silent'.freeze
 def flac_bitrate(path)
   s = `file "#{path}"`
   s[s.rindex(':')..-1].scan(/.*, ([0-9]*\.?[0-9]+) kHz,.*/).first.last.to_i
+rescue
+  999
 end
 
 def convert_flac_to_mpc(source, destination)
@@ -19,7 +21,7 @@ def convert_flac_to_mpc(source, destination)
 end
 
 def convert_alac_to_mpc(source, destination)
-  `ffmpeg -i "#{source}" -f wav - | #{MPCENC} - "#{destination}"`
+  `avconv -i "#{source}" -f wav - | #{MPCENC} - "#{destination}"`
 end
 
 def convert_wav_to_mpc(source, destination)
@@ -46,13 +48,9 @@ def lossy_mirror(origin, destination)
       FileUtils.cp(f, df)
     else
       df = "#{df[0..df.rindex('.')]}mpc"
-      puts "Covnerting to #{df}"
       next if existing_destination_files.include?(df)
-      puts "still here"
       convert_func = CONVERT_TYPES[f[f.rindex('.') + 1..-1].to_sym]
-      puts "Conver func: #{convert_func}"
       send(convert_func, f, df) if convert_func
-      puts "Done converting"
     end
   end
 end
