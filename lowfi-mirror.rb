@@ -6,7 +6,7 @@ CONVERT_TYPES = {
   m4a:  :convert_alac_to_mpc,
   wav:  :convert_wav_to_mpc
 }
-MPCENC = 'mpcenc --silent --extreme'.freeze
+MPCENC = 'mpcenc --silent'.freeze
 
 def flac_bitrate(path)
   s = `file "#{path}"`
@@ -14,7 +14,7 @@ def flac_bitrate(path)
 end
 
 def convert_flac_to_mpc(source, destination)
-  sox = flac_bitrate(source) > 48 ? 'sox -twav - -twavpcm - rate -v 48000 |' : ''
+  sox = flac_bitrate(source) > 45 ? 'sox -twav - -twavpcm - rate -v 44100 |' : ''
   `flac -c -d "#{source}" | #{sox} #{MPCENC} - "#{destination}"`
 end
 
